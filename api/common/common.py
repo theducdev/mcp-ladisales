@@ -7,6 +7,7 @@ import requests
 
 # API Configuration
 BASE_URL = "https://apiv5.sales.ldpform.net/2.0/api"
+BASE_LOCATION_URL = "https://apiv5.sales.ldpform.net/2.0/public"
 API_KEY = "NzUeck7WdeqwUzdexKMVVd0Y"
 
 headers = {
