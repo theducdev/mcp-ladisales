@@ -162,47 +162,68 @@ def register_customer_tools(mcp: FastMCP):
         Cập nhật thông tin của một khách hàng.
         
         Args:
-            customer_id: ID của khách hàng cần cập nhật
-            first_name: Tên mới của khách hàng
-            last_name: Họ mới của khách hàng
-            email: Địa chỉ email mới (phải là duy nhất)
-            phone: Số điện thoại mới (phải là duy nhất)
-            note: Ghi chú mới về khách hàng
-            tags: Danh sách các tag mới
+            customer_id: ID của khách hàng cần cập nhật (số nguyên)
+            first_name: Tên mới của khách hàng (chuỗi)
+            last_name: Họ mới của khách hàng (chuỗi)
+            email: Địa chỉ email mới (phải là duy nhất và đúng định dạng email)
+            phone: Số điện thoại mới (phải là duy nhất và chỉ chứa số)
+            note: Ghi chú mới về khách hàng (chuỗi tùy ý)
+            tags: Danh sách các tag mới (mảng chuỗi)
             custom_fields: Danh sách các trường tùy chỉnh mới
-                Mỗi trường có dạng:
+                Mỗi trường PHẢI có đầy đủ các thông tin sau:
                 {
-                    "custom_field_id": int,
-                    "custom_field_value_id": int,
-                    "label": str,
-                    "data_type": str,
-                    "data_values": Any,
-                    "value": str
+                    "custom_field_id": int,       # ID của trường tùy chỉnh (bắt buộc)
+                    "custom_field_value_id": int, # ID của giá trị trường tùy chỉnh
+                    "label": str,                 # Nhãn hiển thị của trường
+                    "data_type": str,             # Kiểu dữ liệu của trường, có thể là:
+                                                 # - "DATE": Định dạng ngày tháng
+                                                 # - "TEXT_AREA": Văn bản nhiều dòng
+                                                 # - "INPUT_TEXT": Văn bản một dòng
+                                                 # - "NUMBER": Số
+                    "data_values": Any,           # Giá trị dữ liệu bổ sung (có thể null)
+                    "value": str                  # Giá trị của trường (phải phù hợp với data_type)
                 }
         
         Returns:
             Dict chứa thông tin khách hàng đã cập nhật
             
-        Example:
-            update_customer(
-                customer_id=989898938,
-                first_name="Chu",
-                last_name="Manh",
-                email="example@gmail.com",
-                phone="0943555666",
-                note="Ghi chu",
-                tags=["Tag"],
-                custom_fields=[
-                    {
-                        "custom_field_id": 27,
-                        "custom_field_value_id": 829,
-                        "label": "Test_Date",
-                        "data_type": "DATE",
-                        "data_values": None,
-                        "value": ""
-                    }
-                ]
-            )
+        Format Request:
+            {
+                "customer": {
+                    "customer_id": 989898938,
+                    "first_name": "chu",
+                    "last_name": "Manh",
+                    "email": "example@gmail.com",
+                    "phone": "0943555666",
+                    "custom_fields": [
+                        {
+                            "custom_field_id": 27,
+                            "custom_field_value_id": 829,
+                            "label": "Test_Date",
+                            "data_type": "DATE",
+                            "data_values": null,
+                            "value": ""
+                        },
+                        {
+                            "custom_field_id": 62,
+                            "custom_field_value_id": 830,
+                            "label": "refactor",
+                            "data_type": "TEXT_AREA",
+                            "data_values": null,
+                            "value": "fsdfds"
+                        }
+                    ],
+                    "note": "Ghi chu",
+                    "tags": ["Tag"]
+                }
+            }
+            
+        Lưu ý quan trọng:
+        1. Tất cả ID (customer_id, custom_field_id, custom_field_value_id) phải là số nguyên hợp lệ
+        2. Email phải đúng định dạng và không được trùng với khách hàng khác
+        3. Số điện thoại chỉ được chứa số và không được trùng với khách hàng khác
+        4. Giá trị trong custom_fields phải phù hợp với data_type tương ứng
+        5. Nếu không muốn cập nhật trường nào, có thể bỏ qua trường đó trong request
         """
         data = {
             "customer": {

@@ -108,36 +108,40 @@ def register_discount_tools(mcp: FastMCP):
         allow_promotion: int = 1
     ) -> Dict:
         """
-        Create a new discount.
+        Tạo mới chương trình khuyến mãi/mã giảm giá.
         
         Args:
-            name: Discount name
-            code: Unique discount code (alphanumeric)
-            type: Discount type:
-                - 1: Fixed amount
-                - 2: Percentage
-                Can be passed as int or string ("fixed"/"percentage")
-            value: Discount value (as string)
-            apply_to: Dict of application rules
-                Example: {"1": 1} for all products
-            min_requirement: Dict of minimum requirements
-                Example: {"1": 1} for all orders
-            customer_groups: Dict of customer group rules
-                Example: {"1": 1} for all customers
-            usage_limit: Maximum number of uses (null for unlimited)
-            one_per_customer: Whether each customer can use only once (1) or multiple times (0)
-            start_date: Start date (ISO format)
-            end_date: End date (ISO format, null for no end date)
-            rule_type: Type of discount rule (default: 1)
-            allow_promotion: Whether discount can be combined (1) or not (0)
+            name (str): Tên chương trình khuyến mãi
+            code (str): Mã khuyến mãi
+            rule_type (int): Loại khuyến mãi (1: Mã khuyến mãi; 2: Chương trình khuyến mãi)
+            type (Union[int, str]): Hình thức giảm giá (1: Theo %; 2: Theo số tiền)
+            value (Union[float, str]): Giá trị giảm giá
+            apply_to (Optional[Dict[str, int]]): Áp dụng với:
+                - Toàn bộ sản phẩm: {"1": 1}
+                - Tag sản phẩm: {"2": [product_tag_id1, product_tag_id2,...]} (Lấy từ API product-tag-search)
+                - Sản phẩm cụ thể: {"3": [product_variant_id1, product_variant_id2,...]} (Lấy từ API product-variant-search)
+            min_requirement (Optional[Dict[str, int]]): Yêu cầu tối thiểu:
+                - Không yêu cầu: {"1": 1}
+                - Tổng tiền tối thiểu: {"2": value} (value là giá trị tổng tiền tối thiểu)
+                - Tổng số lượng sản phẩm tối thiểu: {"3": value}
+            customer_groups (Optional[Dict[str, int]]): Nhóm khách hàng (Chỉ áp dụng với mã khuyến mãi):
+                - Tất cả khách hàng: {"1": 1}
+                - Tag khách hàng: {"2": [customer_tag_id1, customer_tag_id2,...]} (Lấy từ API customer-tag-search)
+                - Khách hàng cụ thể: {"3": [customer_id1, customer_id2,...]} (Lấy từ API customer-search)
+            usage_limit (Optional[int]): Giới hạn số lần sử dụng
+            one_per_customer (int): Giới hạn mỗi khách hàng chỉ được sử dụng 1 lần (0: Không; 1: Có)
+            start_date (Optional[str]): Ngày bắt đầu (định dạng ISO: YYYY-MM-DDTHH:mm:ss.sssZ)
+            end_date (Optional[str]): Ngày kết thúc (định dạng ISO: YYYY-MM-DDTHH:mm:ss.sssZ)
+            allow_promotion (int): Cho phép dùng chung với CTKM (0: Không; 1: Có)
         
         Returns:
-            Dict containing the created discount details
+            Dict: Thông tin chi tiết của discount sau khi tạo
             
         Example:
             create_discount(
-                name="Spring Sale",
+                name="Khuyến mãi mùa xuân",
                 code="SPRING",
+                rule_type=1,
                 type=2,
                 value="10000",
                 apply_to={"1": 1},
@@ -145,7 +149,8 @@ def register_discount_tools(mcp: FastMCP):
                 customer_groups={"1": 1},
                 usage_limit=None,
                 one_per_customer=1,
-                start_date="2024-01-12T07:55:28.814Z"
+                start_date="2024-01-12T07:55:28.814Z",
+                allow_promotion=1
             )
         """
         # Convert string type to number if needed
@@ -204,21 +209,50 @@ def register_discount_tools(mcp: FastMCP):
         allow_promotion: Optional[int] = None
     ) -> Dict:
         """
-        Update an existing discount.
+        Cập nhật thông tin chương trình khuyến mãi/mã giảm giá.
         
         Args:
-            discount_id: ID of the discount to update
-            Other parameters: Same as create_discount, all optional
+            discount_id (Union[int, str]): ID của discount cần cập nhật
+            name (Optional[str]): Tên chương trình khuyến mãi
+            code (Optional[str]): Mã khuyến mãi
+            rule_type (Optional[int]): Loại khuyến mãi (1: Mã khuyến mãi; 2: Chương trình khuyến mãi)
+            type (Optional[Union[int, str]]): Hình thức giảm giá (1: Theo %; 2: Theo số tiền)
+            value (Optional[Union[float, str]]): Giá trị giảm giá
+            apply_to (Optional[Dict[str, int]]): Áp dụng với:
+                - Toàn bộ sản phẩm: {"1": 1}
+                - Tag sản phẩm: {"2": [product_tag_id1, product_tag_id2,...]} (Lấy từ API product-tag-search)
+                - Sản phẩm cụ thể: {"3": [product_variant_id1, product_variant_id2,...]} (Lấy từ API product-variant-search)
+            min_requirement (Optional[Dict[str, int]]): Yêu cầu tối thiểu:
+                - Không yêu cầu: {"1": 1}
+                - Tổng tiền tối thiểu: {"2": value} (value là giá trị tổng tiền tối thiểu)
+                - Tổng số lượng sản phẩm tối thiểu: {"3": value}
+            customer_groups (Optional[Dict[str, int]]): Nhóm khách hàng (Chỉ áp dụng với mã khuyến mãi):
+                - Tất cả khách hàng: {"1": 1}
+                - Tag khách hàng: {"2": [customer_tag_id1, customer_tag_id2,...]} (Lấy từ API customer-tag-search)
+                - Khách hàng cụ thể: {"3": [customer_id1, customer_id2,...]} (Lấy từ API customer-search)
+            usage_limit (Optional[int]): Giới hạn số lần sử dụng
+            one_per_customer (Optional[int]): Giới hạn mỗi khách hàng chỉ được sử dụng 1 lần (0: Không; 1: Có)
+            start_date (Optional[str]): Ngày bắt đầu (định dạng ISO: YYYY-MM-DDTHH:mm:ss.sssZ)
+            end_date (Optional[str]): Ngày kết thúc (định dạng ISO: YYYY-MM-DDTHH:mm:ss.sssZ)
+            allow_promotion (Optional[int]): Cho phép dùng chung với CTKM (0: Không; 1: Có)
         
         Returns:
-            Dict containing the updated discount details
+            Dict: Thông tin chi tiết của discount sau khi cập nhật
             
         Example:
             update_discount(
                 discount_id=44,
+                name="Khuyến mãi mùa xuân",
                 code="SPRING",
+                rule_type=1,
+                type=2,
                 value="10000",
-                type=2
+                apply_to={"1": 1},
+                min_requirement={"1": 1},
+                customer_groups={"1": 1},
+                one_per_customer=1,
+                start_date="2022-01-12T07:55:28.814Z",
+                allow_promotion=1
             )
         """
         # Convert string type to number if needed
