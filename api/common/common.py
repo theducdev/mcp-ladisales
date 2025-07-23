@@ -4,11 +4,19 @@ Common utilities and configurations for LaDiSales API.
 
 from typing import Dict
 import requests
+import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # API Configuration
 BASE_URL = "https://apiv5.sales.ldpform.net/2.0/api"
 BASE_LOCATION_URL = "https://apiv5.sales.ldpform.net/2.0/public"
-API_KEY = "NzUeck7WdeqwUzdexKMVVd0Y"
+API_KEY = os.getenv("API_KEY")
+
+if not API_KEY:
+    raise ValueError("API_KEY environment variable is not set")
 
 headers = {
     "Api-Key": API_KEY,
