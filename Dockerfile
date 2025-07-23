@@ -4,8 +4,7 @@ WORKDIR /app
 
 # Cài đặt các dependencies
 COPY pyproject.toml uv.lock ./
-RUN pip install uv && \
-    uv pip install -e .
+RUN pip install uv && uv sync
 
 # Copy source code
 COPY . .
@@ -13,5 +12,5 @@ COPY . .
 # Expose port
 EXPOSE 8000
 
-# Run the application
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"] 
+# Run the application using uv
+CMD ["uv", "run", "main.py"] 
