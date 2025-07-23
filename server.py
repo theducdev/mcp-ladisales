@@ -15,7 +15,7 @@ from api.customers.customers import register_customer_tools
 from api.location.location import register_location_tools
 
 # Create an MCP server
-mcp = FastMCP("LaDiSales")
+mcp = FastMCP("LaDiSales", host="0.0.0.0", port=8000)
 
 # Register all tools
 register_discount_tools(mcp)
