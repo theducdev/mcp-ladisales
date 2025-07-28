@@ -170,8 +170,8 @@ def register_product_tools(mcp: FastMCP):
         status: str = "Active",  # Ẩn hoặc hiển thị sản phẩm với bên ngoài
         external_link: str = "",  # Đường dẫn external
         variants: Optional[List[Dict]] = None,  # Danh sách biến thể
-        tags: Optional[List] = None,  # Danh sách tags
-        product_up_sells: Optional[List] = None,  # Danh sách sản phẩm up-sell
+        tags: Optional[List[str]] = None,  # Danh sách tags
+        product_up_sells: Optional[List[int]] = None,  # Danh sách sản phẩm up-sell
         is_publish: bool = True  # Trạng thái xuất bản
     ) -> Dict:
         """
